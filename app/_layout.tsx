@@ -1,25 +1,52 @@
 import '../global.css';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
-
-import { useColorScheme } from '@/hooks/use-color-scheme';
-
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
+import { Slot, useRouter, useSegments } from 'expo-router';
+import { useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
+import { useAuthStore } from '@/store/useAuthStore';
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
+
+  const { user, isInitialized, setSession, setUser, setInitialized } = useAuthStore();
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    const init = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+
+      setSession(session);
+      setUser(session?.user ?? null);
+      setInitialized(true);
+    };
+    init();
+
+    const {data: { subscription }} = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [setSession, setUser, setInitialized]);
+
+  useEffect(() => {
+    if(!isInitialized) return;
+
+    const inAuthGroup = segments[0]?.startsWith('(auth)');
+
+    if(!user && !inAuthGroup) {
+      router.replace('/login');
+    } 
+    
+    if (user && inAuthGroup) {
+      router.replace('/dashboard');
+    }
+  }, [user, isInitialized, segments, router]);
+
+  if(!isInitialized) return null;
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <Slot />
   );
 }
