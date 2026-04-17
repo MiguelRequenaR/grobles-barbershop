@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native'
+import { View, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native'
+import { Text } from '@/components/ui/Text';
 import { Link } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';

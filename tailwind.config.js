@@ -6,7 +6,12 @@ module.exports = {
   ],
   presets: [require("nativewind/preset")],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        comfortaa: ['Comfortaa_400Regular', 'sans-serif'],
+        comfortaaBold: ['Comfortaa_700Bold', 'sans-serif'],
+      }
+    },
   },
   plugins: [],
 };
