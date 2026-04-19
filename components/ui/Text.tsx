@@ -8,7 +8,7 @@ export function Text({ className = '', bold = false, style, ...props }: CustomTe
   const fontFamily = bold ? 'Comfortaa_700Bold' : 'Comfortaa_400Regular';
   return (
     <RNText
-      className={`text-white ${className}`}
+      className={`text-[#1f1f1f] ${className}`}
       style={[{ fontFamily }, style]}
       {...props}
     />
