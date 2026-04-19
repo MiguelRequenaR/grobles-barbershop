@@ -1,6 +1,6 @@
 import '../global.css';
 import { Slot, useRouter, useSegments } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts, Comfortaa_400Regular, Comfortaa_700Bold } from '@expo-google-fonts/comfortaa';
 import { supabase } from '@/lib/supabase';
@@ -11,7 +11,6 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
 
   const { user, isInitialized, setSession, setUser, setInitialized } = useAuthStore();
-  const [isNavigating, setIsNavigating] = useState(false);
   const segments = useSegments();
   const router = useRouter();
 
@@ -50,21 +49,18 @@ export default function RootLayout() {
     const inAuthGroup = segments[0] === ('(auth)');
 
     if(!user && !inAuthGroup) {
-      setIsNavigating(true);
       router.replace('/login');
       return;
     } 
     
     if (user && inAuthGroup) {
-      setIsNavigating(true);
       router.replace('/dashboard');
       return;
     }
 
-    setIsNavigating(false);
   }, [user, isInitialized, segments, router, fontsLoaded, fontError]);
 
-  if(!isInitialized || !fontsLoaded || isNavigating) return null;
+  if(!isInitialized || !fontsLoaded) return null;
 
   return (
     <Slot />
