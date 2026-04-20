@@ -2,7 +2,6 @@ import AuthTabs from "@/components/auth/AuthTabs";
 import LoginPanel from "@/components/auth/LoginPanel";
 import RegisterPanel from "@/components/auth/RegisterPanel";
 import { Text } from "@/components/ui/Text";
-import { supabase } from "@/lib/supabase";
 import {
   authSchema,
   AuthSchema,
@@ -28,6 +27,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { loginWithEmail, registerWithEmail } from "@/services/auth";
 
 type AuthTab = "login" | "register";
 
@@ -111,14 +111,14 @@ export default function AuthScreen() {
   const onSignIn = handleLoginSubmit(async (data) => {
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: data.password,
-      });
+      const result = await loginWithEmail(data.email, data.password);
 
-      if (error) {
-        Alert.alert("Error al iniciar sesión", error.message);
+      if (!result.ok) {
+        Alert.alert("Error al iniciar sesión", result.message);
+        return;
       }
+
+      router.replace("/dashboard");
     } finally {
       setIsLoading(false);
     }
@@ -127,36 +127,26 @@ export default function AuthScreen() {
   const onRegister = handleRegisterSubmit(async (data) => {
     setIsLoading(true);
     try {
-      const { data: signUpData, error } = await supabase.auth.signUp({
+      const result = await registerWithEmail({
         email: data.email,
         password: data.password,
-        options: {
-          data: {
-            shop_name: data.shopName,
-          },
-        },
+        shopName: data.shopName,
       });
 
-      if (error) {
-        Alert.alert("Error", error.message);
+      if (!result.ok) {
+        Alert.alert("Error", result.message);
         return;
       }
 
-      if (signUpData.session) {
+      if (!result.needsEmailVerification) {
         Alert.alert("¡Éxito!", "Cuenta creada correctamente");
         router.replace("/dashboard");
         return;
       }
 
-      Alert.alert(
-        "Verifica tu correo",
-        "Hemos enviado un enlace de confirmación a tu email.",
-      );
+      Alert.alert("Verifica tu correo", result.message);
       setLoginValue("email", data.email);
       animateToTab("login");
-    } catch (error) {
-      console.error(error);
-      Alert.alert("Error", "Ocurrió un error al crear la cuenta. Intenta nuevamente.");
     } finally {
       setIsLoading(false);
     }
