@@ -239,6 +239,7 @@ function AnimatedTabItem({
                 color: LABEL_COLOR,
                 fontSize: 13,
                 fontWeight: "600",
+                fontFamily: "Comfortaa_400Regular",
               }}
             >
               {label}
@@ -257,6 +258,7 @@ function AnimatedTabItem({
             opacity: 0,
             fontSize: 13,
             fontWeight: "600",
+            fontFamily: "Comfortaa_400Regular",
           }}
           pointerEvents="none"
           accessibilityElementsHidden
