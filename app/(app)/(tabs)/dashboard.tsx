@@ -1,9 +1,14 @@
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import DashboardGreeting from "@/components/dashboard/DashboardGreeting"
+import DashboardSummaryCards from "@/components/dashboard/DashboardSummaryCards"
+import UpcomingAppointments from "@/components/dashboard/UpcomingAppointments"
 
 export default function Dashboard() {
   return (
-    <View className="flex-1 items-center justify-center bg-[#f7f1e6]">
-      <Text className="text-base text-[#1f1f1f]">Dashboard</Text>
+    <View className="flex-1 p-4 bg-[#f7f1e6]">
+      <DashboardGreeting />
+      <DashboardSummaryCards />
+      <UpcomingAppointments />
     </View>
   );
 }

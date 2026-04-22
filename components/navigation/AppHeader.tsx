@@ -4,7 +4,7 @@ import { Pressable, View } from "react-native"
 import { Text } from "@/components/ui/Text"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
-const DEFAULT_AVATAR =   "https://api.dicebear.com/7.x/avataaars/png?seed=barber&backgroundColor=b6e3f4";
+const DEFAULT_AVATAR =   "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F4715%2F4715330.png&f=1&nofb=1&ipt=dc33e769d05de980b766400466a08cb8ca20d1d045625355d1ec793a13d43c6c";
 
 type AppHeaderProps = {
   brandTitle?: string;
@@ -57,9 +57,10 @@ export default function AppHeader({
               hitSlop={12}
               className="p-1 active:opacity-70"
             >
-              <Ionicons name="notifications-outline" size={26} color="#d1d5db" />
+              <Ionicons name="notifications" size={26} color="#ebf494" />
             </Pressable>
           </View>
+     
         </View>
       </View>
     </View>
