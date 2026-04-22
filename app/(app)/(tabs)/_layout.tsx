@@ -7,6 +7,9 @@ export default function AppTabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
+        sceneStyle: {
+          backgroundColor: "#1f1f1f",
+        }
       }}
       tabBar={(props) => <AnimatedBottomTabBar {...props} />}
     >

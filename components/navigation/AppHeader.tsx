@@ -22,7 +22,7 @@ export default function AppHeader({
   const insets = useSafeAreaInsets();
   return (
     <View
-      className="bg-primary px-4 rounded-b-[35px]"
+      className="bg-[#292a2a] px-4 rounded-b-[35px]"
       style={{ paddingTop: Math.max(insets.top, 8) }}
     >
       <View className="pb-5">

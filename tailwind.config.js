@@ -8,9 +8,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: "#1f1f1f",
-        secondary: "#e5e2e1",
-
+        primary: "#ff9900",
+        secondary: "#1f1f1f",
+        tertiary: "#e5e2e1",
       },
       fontFamily: {
         comfortaa: ['Comfortaa_400Regular', 'sans-serif'],

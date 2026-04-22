@@ -18,10 +18,10 @@ export default function DashboardGreeting() {
 
   return (
     <View className="mb-6">
-      <Text className="text-3xl mb-1">
-        Hola, <Text bold>{greetingName}</Text>
+      <Text className="text-3xl mb-1 text-white">
+        Hola, <Text bold className="text-primary uppercase">{greetingName}</Text>
       </Text>
-      <Text className="text-lg text-gray-700">
+      <Text className="text-lg text-white">
         Resumen de hoy, {formattedDate}
       </Text>
     </View>

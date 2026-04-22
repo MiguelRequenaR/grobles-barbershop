@@ -1,14 +1,36 @@
-import { Pressable } from "react-native";
+import type { ReactNode } from "react";
+import { Pressable, View } from "react-native";
 import { Text } from "./Text";
 
-export default function Button({title, onPress, disabled} : any) {
+type ButtonProps = {
+  title: string;
+  onPress: () => void;
+  disabled?: boolean;
+  className?: string;
+  textClassName?: string;
+  leftIcon?: ReactNode;
+};
+
+export default function Button({
+  title,
+  onPress,
+  disabled = false,
+  className = "",
+  textClassName = "",
+  leftIcon,
+}: ButtonProps) {
   return (
     <Pressable
       onPress={onPress}
       disabled={disabled}
-      className="bg-[#1f1f1f] rounded-full p-3 items-center justify-center"
+      className={`bg-[#1f1f1f] rounded-full p-3 items-center justify-center ${className}`}
     >
-      <Text className="text-white text-base font-medium">{title}</Text>
+      <View className="flex-row items-center gap-2">
+        {leftIcon}
+        <Text className={`text-white text-base font-medium ${textClassName}`}>
+          {title}
+        </Text>
+      </View>
     </Pressable>
-  )
+  );
 }

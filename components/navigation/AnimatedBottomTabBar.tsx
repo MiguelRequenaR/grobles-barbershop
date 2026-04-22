@@ -28,7 +28,7 @@ const COLLAPSED_WIDTH = 48;
 const ICON_SIZE = 20;
 const H_PADDING = 14;
 const ICON_LABEL_GAP = 6;
-const ACTIVE_COLOR = "#111827";
+const ACTIVE_COLOR = "#1f1f1f";
 const INACTIVE_COLOR = "#4b5563";
 const LABEL_COLOR = "#ffffff";
 
