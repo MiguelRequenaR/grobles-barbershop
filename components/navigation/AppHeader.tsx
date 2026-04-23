@@ -22,27 +22,15 @@ export default function AppHeader({
   const insets = useSafeAreaInsets();
   return (
     <View
-      className="bg-[#292a2a] px-4 rounded-b-[35px]"
+      className="px-4 rounded-b-[35px]"
       style={{ paddingTop: Math.max(insets.top, 8) }}
     >
       <View className="pb-5">
-        <View className="flex-row items-center">
-          <View className="w-12 items-start">
-            <Pressable
-              onPress={onPressAvatar}
-              className="h-11 w-11 overflow-hidden rounded-full border-2 border-white/90 active:opacity-80"
-            >
-              <Image
-                source={{ uri: avatarUrl }}
-                style={{ width: "100%", height: "100%" }}
-                contentFit="cover"
-              />
-            </Pressable>
-          </View>
-          <View className="flex-1 items-center px-2">
+        <View className="flex-row items-center justify-between">
+          <View className="items-center px-4 bg-[#292a2a] py-2 rounded-full ">
             <Text
               bold
-              className="text-xl text-white uppercase font-bold"
+              className="text-xl text-white font-bold"
               style={{
                 fontFamily: "Comfortaa_700Bold",
                 fontStyle: "italic",
@@ -51,17 +39,31 @@ export default function AppHeader({
               {brandTitle}
             </Text>
           </View>
-          <View className="w-12 items-end">
-            <Pressable
-              onPress={onPressNotifications}
-              hitSlop={12}
-              className="p-1 active:opacity-70"
-            >
-              <Ionicons name="notifications" size={26} color="#ebf494" />
-            </Pressable>
+          <View className="flex-row items-center gap-x-1 bg-[#292a2a] rounded-full p-1">
+            <View className="w-12 items-start">
+              <Pressable
+                onPress={onPressAvatar}
+                className="h-11 w-11 overflow-hidden rounded-full border-2 border-white/90 active:opacity-80"
+              >
+                <Image
+                  source={{ uri: avatarUrl }}
+                  style={{ width: "100%", height: "100%" }}
+                  contentFit="cover"
+                />
+              </Pressable>
+            </View>
+            <View className="w-12 items-end">
+              <Pressable
+                onPress={onPressNotifications}
+                hitSlop={12}
+                className="p-1 active:opacity-70"
+              >
+                <Ionicons name="notifications" size={26} color="#ebf494" />
+              </Pressable>
+            </View>
           </View>
-     
         </View>
+  
       </View>
     </View>
   );
