@@ -1,7 +1,7 @@
+import { Text } from "@/components/ui/Text"
 import { Ionicons } from "@expo/vector-icons"
 import { Image } from "expo-image"
 import { Pressable, View } from "react-native"
-import { Text } from "@/components/ui/Text"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 const DEFAULT_AVATAR =   "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F4715%2F4715330.png&f=1&nofb=1&ipt=dc33e769d05de980b766400466a08cb8ca20d1d045625355d1ec793a13d43c6c";
@@ -22,7 +22,7 @@ export default function AppHeader({
   const insets = useSafeAreaInsets();
   return (
     <View
-      className="px-4 rounded-b-[35px]"
+      className="px-4 bg-transparent"
       style={{ paddingTop: Math.max(insets.top, 8) }}
     >
       <View className="pb-5">

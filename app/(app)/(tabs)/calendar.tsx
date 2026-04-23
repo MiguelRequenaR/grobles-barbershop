@@ -1,9 +1,12 @@
-import { Text, View } from "react-native";
+import { ScrollView } from "react-native";
+import CalendarAppointmetsList from "@/components/calendar/CalendarAppointmetsList";
+import CalendarGreeting from "@/components/calendar/CalendarGreeting";
 
 export default function CalendarScreen() {
   return (
-    <View className="flex-1 items-center justify-center">
-      <Text className="text-base text-[#1f1f1f]">Calendario</Text>
-    </View>
+    <ScrollView className="flex-1" contentContainerClassName="p-4 pt-32 pb-24">
+      <CalendarGreeting />
+      <CalendarAppointmetsList />
+    </ScrollView>
   );
 }

@@ -23,7 +23,7 @@ export default function Dashboard() {
     <>
       <ScrollView
         className="flex-1"
-        contentContainerClassName="p-4 gap-6 pb-24"
+        contentContainerClassName="p-4 pt-32 gap-6 pb-24"
         refreshControl={
           <RefreshControl
             refreshing={isRefetching}
