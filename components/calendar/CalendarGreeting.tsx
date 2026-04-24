@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, Pressable, View, useWindowDimensions } from "react-native";
 import { Text } from "@/components/ui/Text";
 
@@ -27,14 +27,19 @@ const addDays = (date: Date, days: number) => {
 
 export default function CalendarGreeting({
   title = "Turnos del día",
-  selectedDate = new Date(),
+  selectedDate,
   onSelectedDateChange,
 }: CalendarGreetingProps) {
   const listRef = useRef<FlatList<Date>>(null);
   const { width: screenWidth } = useWindowDimensions();
-  const initialDate = useMemo(() => startOfDay(selectedDate), [selectedDate]);
+  const [initialDate] = useState(() => startOfDay(selectedDate ?? new Date()));
   const [currentSelectedDate, setCurrentSelectedDate] = useState(initialDate);
   const sidePadding = Math.max((screenWidth - DAY_CARD_WIDTH) / 2, 0);
+
+  useEffect(() => {
+    if (!selectedDate) return;
+    setCurrentSelectedDate(startOfDay(selectedDate));
+  }, [selectedDate]);
 
   const dates = useMemo(
     () =>

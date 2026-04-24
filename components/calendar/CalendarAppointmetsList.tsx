@@ -91,8 +91,16 @@ export default function CalendarAppointmetsList({
   onMorePress,
   onReviewPress,
 }: CalendarAppointmetsListProps) {
+  if (appointments.length === 0) {
+    return (
+      <View className="items-center justify-center rounded-3xl border border-dashed border-white/10 bg-white/5 px-4 py-8">
+        <Text className="text-tertiary text-base">No hay turnos para este dia.</Text>
+      </View>
+    );
+  }
+
   return (
-    <View className="mt-4 gap-5 pb-10">
+    <View className="gap-5 pb-10">
       {appointments.map((appointment, index) => {
         const hasVerticalConnector = index !== appointments.length - 1;
         const isInProgress = appointment.status === "InProgress";
