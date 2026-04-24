@@ -8,13 +8,14 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { getCurrentShopByOwner } from '@/services/shopService';
 
 SplashScreen.preventAutoHideAsync();
 const queryClient = new QueryClient();
 
 export default function RootLayout() {
 
-  const { user, isInitialized, setSession, setUser, setInitialized } = useAuthStore();
+  const { user, isInitialized, setSession, setUser, setInitialized, setShopId } = useAuthStore();
   const segments = useSegments();
   const router = useRouter();
 
@@ -63,6 +64,34 @@ export default function RootLayout() {
     }
 
   }, [user, isInitialized, segments, router, fontsLoaded, fontError]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadShop = async () => {
+      if (!user?.id) {
+        setShopId(null);
+        return;
+      }
+      try {
+        const shop = await getCurrentShopByOwner(user.id);
+        if (!cancelled) {
+          setShopId(shop?.id ?? null);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setShopId(null);
+        }
+        console.error("Error cargando la barbería actual:", error);
+      }
+    };
+
+    loadShop();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id, setShopId])
 
   if(!isInitialized || !fontsLoaded) return null;
 

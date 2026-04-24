@@ -18,6 +18,9 @@ export async function getDashboardStats(shopId: string): Promise<DashboardStats>
   const startOfDay = new Date();
   startOfDay.setHours(0, 0, 0, 0);
 
+  const endOfDay = new Date(startOfDay);
+  endOfDay.setDate(endOfDay.getDate() + 1);
+
   // Obtenemos los ingresos (citas completadas)
   const { data: incomeData, error: incomeError } = await supabase
     .from("appointments")
@@ -38,13 +41,17 @@ export async function getDashboardStats(shopId: string): Promise<DashboardStats>
     .from("appointments")
     .select("*", { count: "exact", head: true })
     .eq("shop_id", shopId)
-    .gte("appointment_date", startOfDay.toISOString());
+    .gte("appointment_date", startOfDay.toISOString())
+    .lt("appointment_date", endOfDay.toISOString())
 
   if (turnosError) {
     throw new Error(turnosError.message || "Error al obtener turnos");
   }
 
-  // Obtenemos los próximos turnos
+  // Próximos turnos incluye turnos recien creados
+  const upcomingWindowStart = new Date();
+  upcomingWindowStart.setMinutes(upcomingWindowStart.getMinutes() - 45);
+
   const { data: rawUpcoming, error: upcomingError } = await supabase
     .from("appointments")
     .select(`
@@ -55,21 +62,33 @@ export async function getDashboardStats(shopId: string): Promise<DashboardStats>
       services(name)
     `)
     .eq("shop_id", shopId)
-    .gte("appointment_date", new Date().toISOString())
+    .gte("appointment_date", upcomingWindowStart.toISOString())
     .order("appointment_date", { ascending: true })
-    .limit(5);
+    .limit(8);
 
   if (upcomingError) {
     throw new Error(upcomingError.message || "Error al obtener próximos turnos");
   }
 
-  const proximosTurnos: UpcomingAppointment[] = (rawUpcoming ?? []).map((row: any) => ({
-    id: row.id,
-    appointment_date: row.appointment_date,
-    status: row.status,
-    customer_name: row.customers?.full_name ?? "Sin nombre",
-    service_name: row.services?.name ?? "Sin servicio",
-  }));
+  const pickNested = <T extends { full_name?: string } | { name?: string }>(
+    value: T | T[] | null | undefined,
+    key: keyof T,
+  ): string | undefined => {
+    if (!value) return undefined;
+    const row = Array.isArray(value) ? value[0] : value;
+    return row?.[key] as string | undefined;
+  };
+
+  const proximosTurnos: UpcomingAppointment[] = (rawUpcoming ?? [])
+    .slice(0, 5)
+    .map((row: any) => ({
+      id: row.id,
+      appointment_date: row.appointment_date,
+      status: row.status,
+      customer_name:
+        pickNested(row.customers, "full_name") ?? "Sin nombre",
+      service_name: pickNested(row.services, "name") ?? "Sin servicio",
+    }));
 
   return {
     ingresos,

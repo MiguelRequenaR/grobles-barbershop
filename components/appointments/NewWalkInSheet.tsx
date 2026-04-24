@@ -1,4 +1,4 @@
-import { forwardRef, useMemo, useState } from "react";
+import { forwardRef, useEffect, useMemo, useState } from "react";
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
@@ -8,41 +8,56 @@ import { Ionicons } from "@expo/vector-icons";
 import { Pressable, TextInput, View } from "react-native";
 import { Text } from "@/components/ui/Text";
 import Button from "@/components/ui/Button";
-
-type QuickService = "Corte Clasico" | "Fade" | "Barba" | "Combo";
+import type { ShopServiceOption } from "@/services/servicesCatalogService";
 
 type NewWalkInPayload = {
   customerName: string;
   phone: string;
-  quickService: QuickService;
+  serviceId: string;
 };
 
 interface NewWalkInSheetProps {
-  onSubmit?: (payload: NewWalkInPayload) => void;
+  services: ShopServiceOption[];
+  servicesLoading?: boolean;
+  onSubmit?: (payload: NewWalkInPayload) => Promise<void> | void;
   onClose?: () => void;
+  isSubmitting?: boolean;
 }
 
-const QUICK_SERVICES: QuickService[] = [
-  "Corte Clasico",
-  "Fade",
-  "Barba",
-  "Combo",
-];
-
 const NewWalkInSheet = forwardRef<BottomSheetModal, NewWalkInSheetProps>(
-  ({ onSubmit, onClose }, ref) => {
+  (
+    { services, servicesLoading = false, onSubmit, onClose, isSubmitting = false },
+    ref,
+  ) => {
     const snapPoints = useMemo(() => ["95%"], []);
     const [search, setSearch] = useState("");
     const [customerName, setCustomerName] = useState("");
     const [phone, setPhone] = useState("");
-    const [quickService, setQuickService] =
-      useState<QuickService>("Corte Clasico");
+    const [selectedServiceId, setSelectedServiceId] = useState<string | null>(
+      null,
+    );
 
-    const handleSubmit = () => {
-      onSubmit?.({
+    useEffect(() => {
+      if (services.length === 0) {
+        setSelectedServiceId(null);
+        return;
+      }
+      setSelectedServiceId((current) => {
+        if (current && services.some((s) => s.id === current)) {
+          return current;
+        }
+        return services[0].id;
+      });
+    }, [services]);
+
+    const handleSubmit = async () => {
+      if (!selectedServiceId) {
+        return;
+      }
+      await onSubmit?.({
         customerName: customerName.trim(),
         phone: phone.trim(),
-        quickService,
+        serviceId: selectedServiceId,
       });
     };
 
@@ -138,32 +153,47 @@ const NewWalkInSheet = forwardRef<BottomSheetModal, NewWalkInSheetProps>(
             bold
             className="text-tertiary text-sm mb-3 uppercase"
           >
-            Servicio rápido
+            Servicio
           </Text>
-          <View className="flex-row flex-wrap gap-2 mb-8">
-            {QUICK_SERVICES.map((service) => {
-              const isActive = quickService === service;
-              return (
-                <Pressable
-                  key={service}
-                  onPress={() => setQuickService(service)}
-                  className={`px-4 py-2 rounded-full border ${
-                    isActive
-                      ? "bg-primary/20 border-primary"
-                      : "bg-black/50 border-transparent"
-                  }`}
-                >
-                  <Text className={isActive ? "text-primary" : "text-white"}>
-                    {service}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
+          {servicesLoading ? (
+            <Text className="text-tertiary mb-8">Cargando servicios...</Text>
+          ) : services.length === 0 ? (
+            <Text className="text-tertiary mb-8">
+              No hay servicios en esta barbería. Crea al menos uno para registrar
+              walk-ins.
+            </Text>
+          ) : (
+            <View className="flex-row flex-wrap gap-2 mb-8">
+              {services.map((service) => {
+                const isActive = selectedServiceId === service.id;
+                return (
+                  <Pressable
+                    key={service.id}
+                    onPress={() => setSelectedServiceId(service.id)}
+                    className={`px-4 py-2 rounded-full border ${
+                      isActive
+                        ? "bg-primary/20 border-primary"
+                        : "bg-black/50 border-transparent"
+                    }`}
+                  >
+                    <Text className={isActive ? "text-primary" : "text-white"}>
+                      {service.name}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          )}
 
           <Button
-            title="AÑADIR A LA COLA"
+            title={isSubmitting ? "GUARDANDO..." : "AÑADIR A LA COLA"}
             onPress={handleSubmit}
+            disabled={
+              isSubmitting ||
+              servicesLoading ||
+              services.length === 0 ||
+              !selectedServiceId
+            }
             className="bg-[#292a2a] border border-primary rounded-full py-4"
             textClassName="text-white"
             leftIcon={

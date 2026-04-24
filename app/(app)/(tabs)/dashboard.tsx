@@ -1,15 +1,22 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { RefreshControl, ScrollView } from "react-native";
+import { Alert, RefreshControl, ScrollView } from "react-native";
 import DashboardGreeting from "@/components/dashboard/DashboardGreeting"
 import DashboardSummaryCards from "@/components/dashboard/DashboardSummaryCards"
 import UpcomingAppointments from "@/components/dashboard/UpcomingAppointments"
 import { useDashboard } from "@/hooks/useDashboard";
+import { useShopServices } from "@/hooks/useShopServices";
 import { NewWalkInSheet } from "@/components/appointments";
+import { useAuthStore } from "@/store/useAuthStore";
+import { createWalkInAppointment } from "@/services/walkInService";
 
 export default function Dashboard() {
   const { data, isLoading, isRefetching, refetch } = useDashboard();
+  const shopId = useAuthStore((state) => state.shopId);
+  const { data: shopServices = [], isLoading: servicesLoading } =
+    useShopServices(shopId);
   const newWalkInSheetRef = useRef<BottomSheetModal>(null);
+  const [isSubmittingWalkIn, setIsSubmittingWalkIn] = useState(false);
 
   const onRefresh = useCallback(async () => {
     await refetch();
@@ -47,9 +54,34 @@ export default function Dashboard() {
 
       <NewWalkInSheet
         ref={newWalkInSheetRef}
-        onSubmit={(payload) => {
-          console.log("Nuevo walk-in:", payload);
-          newWalkInSheetRef.current?.dismiss();
+        services={shopServices}
+        servicesLoading={servicesLoading}
+        isSubmitting={isSubmittingWalkIn}
+        onSubmit={async (payload) => {
+          if (!shopId) {
+            Alert.alert("Error", "No se pudo identificar la barbería actual.");
+            return;
+          }
+
+          try {
+            setIsSubmittingWalkIn(true);
+            await createWalkInAppointment({
+              shopId,
+              customerName: payload.customerName,
+              phone: payload.phone,
+              serviceId: payload.serviceId,
+            });
+            await refetch();
+            newWalkInSheetRef.current?.dismiss();
+            Alert.alert("Listo", "Walk-in creado correctamente.");
+          } catch (error) {
+            Alert.alert(
+              "No se pudo crear el walk-in",
+              error instanceof Error ? error.message : "Intenta nuevamente.",
+            );
+          } finally {
+            setIsSubmittingWalkIn(false);
+          }
         }}
       />
     </>

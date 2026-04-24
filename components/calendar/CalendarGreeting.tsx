@@ -62,10 +62,10 @@ export default function CalendarGreeting({
     <View className="gap-4">
       <View className="flex-row items-center justify-between">
         <View>
-          <Text bold className="text-white text-4xl">
+          <Text bold className="text-white text-2xl">
             {title}
           </Text>
-          <Text className="text-tertiary text-lg">{formattedSelectedDate}</Text>
+          <Text className="text-tertiary text-base">{formattedSelectedDate}</Text>
         </View>
       </View>
 

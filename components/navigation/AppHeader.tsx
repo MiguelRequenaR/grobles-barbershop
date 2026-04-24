@@ -1,17 +1,17 @@
-import { Text } from "@/components/ui/Text"
-import { Ionicons } from "@expo/vector-icons"
-import { Image } from "expo-image"
-import { Pressable, View } from "react-native"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { Text } from "@/components/ui/Text";
+import { Ionicons } from "@expo/vector-icons";
+import { Pressable, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const DEFAULT_AVATAR =   "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F4715%2F4715330.png&f=1&nofb=1&ipt=dc33e769d05de980b766400466a08cb8ca20d1d045625355d1ec793a13d43c6c";
+const DEFAULT_AVATAR =
+  "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F4715%2F4715330.png&f=1&nofb=1&ipt=dc33e769d05de980b766400466a08cb8ca20d1d045625355d1ec793a13d43c6c";
 
 type AppHeaderProps = {
   brandTitle?: string;
   avatarUrl?: string;
   onPressAvatar?: () => void;
   onPressNotifications?: () => void;
-}
+};
 
 export default function AppHeader({
   brandTitle = "Grobles",
@@ -43,12 +43,13 @@ export default function AppHeader({
             <View className="w-12 items-start">
               <Pressable
                 onPress={onPressAvatar}
-                className="h-11 w-11 overflow-hidden rounded-full border-2 border-white/90 active:opacity-80"
+                hitSlop={12}
+                className="p-1 active:opacity-70"
               >
-                <Image
-                  source={{ uri: avatarUrl }}
-                  style={{ width: "100%", height: "100%" }}
-                  contentFit="cover"
+                <Ionicons
+                  name="person-circle-outline"
+                  size={35}
+                  color="#d1d5db"
                 />
               </Pressable>
             </View>
@@ -58,12 +59,15 @@ export default function AppHeader({
                 hitSlop={12}
                 className="p-1 active:opacity-70"
               >
-                <Ionicons name="notifications" size={26} color="#ebf494" />
+                <Ionicons
+                  name="notifications-outline"
+                  size={26}
+                  color="#ebf494"
+                />
               </Pressable>
             </View>
           </View>
         </View>
-  
       </View>
     </View>
   );
