@@ -28,7 +28,7 @@ const COLLAPSED_WIDTH = 48;
 const ICON_SIZE = 20;
 const H_PADDING = 14;
 const ICON_LABEL_GAP = 6;
-const ACTIVE_COLOR = "#1f1f1f";
+const ACTIVE_COLOR = "#ff9900";
 const INACTIVE_COLOR = "#4b5563";
 const LABEL_COLOR = "#ffffff";
 
@@ -57,7 +57,7 @@ export default function AnimatedBottomTabBar({
           borderRadius: 999,
           overflow: "hidden",
           borderWidth: 1,
-          borderColor: "rgba(255,255,255,0.4)",
+          borderColor: "#ff9900",
         }}
       >
         <View
@@ -68,8 +68,8 @@ export default function AnimatedBottomTabBar({
             paddingVertical: 6,
             backgroundColor:
               Platform.OS === "ios"
-                ? "rgba(255,255,255,0.25)"
-                : "rgba(255,255,255,0.7)",
+                ? "#1f1f1f"
+                : "#1f1f1f",
           }}
         >
           {state.routes.map((route, index) => {

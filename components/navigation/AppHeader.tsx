@@ -3,9 +3,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const DEFAULT_AVATAR =
-  "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F4715%2F4715330.png&f=1&nofb=1&ipt=dc33e769d05de980b766400466a08cb8ca20d1d045625355d1ec793a13d43c6c";
-
 type AppHeaderProps = {
   brandTitle?: string;
   avatarUrl?: string;
@@ -15,7 +12,6 @@ type AppHeaderProps = {
 
 export default function AppHeader({
   brandTitle = "Grobles",
-  avatarUrl = DEFAULT_AVATAR,
   onPressAvatar,
   onPressNotifications,
 }: AppHeaderProps) {
@@ -49,7 +45,7 @@ export default function AppHeader({
                 <Ionicons
                   name="person-circle-outline"
                   size={35}
-                  color="#d1d5db"
+                  color="#ff9900"
                 />
               </Pressable>
             </View>
@@ -62,7 +58,7 @@ export default function AppHeader({
                 <Ionicons
                   name="notifications-outline"
                   size={26}
-                  color="#ebf494"
+                  color="#ff9900"
                 />
               </Pressable>
             </View>
