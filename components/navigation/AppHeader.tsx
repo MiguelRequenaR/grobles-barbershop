@@ -45,7 +45,7 @@ export default function AppHeader({
                 <Ionicons
                   name="person-circle-outline"
                   size={35}
-                  color="#ff9900"
+                  color="#ffffff"
                 />
               </Pressable>
             </View>
@@ -58,7 +58,7 @@ export default function AppHeader({
                 <Ionicons
                   name="notifications-outline"
                   size={26}
-                  color="#ff9900"
+                  color="#ffffff"
                 />
               </Pressable>
             </View>

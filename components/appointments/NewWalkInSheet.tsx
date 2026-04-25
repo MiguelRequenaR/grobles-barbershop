@@ -5,9 +5,10 @@ import {
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
 import { Ionicons } from "@expo/vector-icons";
-import { Pressable, TextInput, View } from "react-native";
+import { ActivityIndicator, Pressable, TextInput, View } from "react-native";
 import { Text } from "@/components/ui/Text";
 import Button from "@/components/ui/Button";
+import type { ShopCustomerOption } from "@/services/customersService";
 import type { ShopServiceOption } from "@/services/servicesCatalogService";
 
 type NewWalkInPayload = {
@@ -19,6 +20,8 @@ type NewWalkInPayload = {
 interface NewWalkInSheetProps {
   services: ShopServiceOption[];
   servicesLoading?: boolean;
+  customers: ShopCustomerOption[];
+  customersLoading?: boolean;
   onSubmit?: (payload: NewWalkInPayload) => Promise<void> | void;
   onClose?: () => void;
   isSubmitting?: boolean;
@@ -26,13 +29,24 @@ interface NewWalkInSheetProps {
 
 const NewWalkInSheet = forwardRef<BottomSheetModal, NewWalkInSheetProps>(
   (
-    { services, servicesLoading = false, onSubmit, onClose, isSubmitting = false },
+    {
+      services,
+      servicesLoading = false,
+      customers,
+      customersLoading = false,
+      onSubmit,
+      onClose,
+      isSubmitting = false,
+    },
     ref,
   ) => {
-    const snapPoints = useMemo(() => ["95%"], []);
+    const snapPoints = useMemo(() => ["85%"], []);
     const [search, setSearch] = useState("");
     const [customerName, setCustomerName] = useState("");
     const [phone, setPhone] = useState("");
+    const [selectedCustomer, setSelectedCustomer] =
+      useState<ShopCustomerOption | null>(null);
+    const [isSearchFocused, setIsSearchFocused] = useState(false);
     const [selectedServiceId, setSelectedServiceId] = useState<string | null>(
       null,
     );
@@ -50,13 +64,70 @@ const NewWalkInSheet = forwardRef<BottomSheetModal, NewWalkInSheetProps>(
       });
     }, [services]);
 
+    const normalize = (value: string) => value.toLowerCase().trim();
+    const normalizePhone = (value: string) => value.replace(/\s+/g, "");
+
+    const filteredCustomers = useMemo(() => {
+      const query = normalize(search);
+      if (!query) {
+        return customers.slice(0, 12);
+      }
+
+      const queryPhone = normalizePhone(query);
+      return customers
+        .filter((customer) => {
+          const customerNameValue = normalize(customer.full_name);
+          const customerPhoneValue = normalizePhone(customer.phone ?? "");
+          return (
+            customerNameValue.includes(query) ||
+            (queryPhone.length > 0 && customerPhoneValue.includes(queryPhone))
+          );
+        })
+        .slice(0, 20);
+    }, [customers, search]);
+
+    const handleSearchChange = (value: string) => {
+      setSearch(value);
+      if (
+        selectedCustomer &&
+        normalize(value) !== normalize(selectedCustomer.full_name)
+      ) {
+        setSelectedCustomer(null);
+      }
+    };
+
+    const handleSelectCustomer = (customer: ShopCustomerOption) => {
+      setSelectedCustomer(customer);
+      setCustomerName(customer.full_name);
+      setPhone(customer.phone ?? "");
+      setSearch(customer.full_name);
+      setIsSearchFocused(false);
+    };
+
+    const resetForm = () => {
+      setSearch("");
+      setCustomerName("");
+      setPhone("");
+      setSelectedCustomer(null);
+      setIsSearchFocused(false);
+      setSelectedServiceId(services[0]?.id ?? null);
+    };
+
     const handleSubmit = async () => {
       if (!selectedServiceId) {
         return;
       }
+
+      const finalName = selectedCustomer
+        ? selectedCustomer.full_name.trim()
+        : customerName.trim();
+      const finalPhone = selectedCustomer
+        ? (selectedCustomer.phone ?? "").trim()
+        : phone.trim();
+
       await onSubmit?.({
-        customerName: customerName.trim(),
-        phone: phone.trim(),
+        customerName: finalName,
+        phone: finalPhone,
         serviceId: selectedServiceId,
       });
     };
@@ -66,7 +137,10 @@ const NewWalkInSheet = forwardRef<BottomSheetModal, NewWalkInSheetProps>(
         ref={ref}
         snapPoints={snapPoints}
         enablePanDownToClose
-        onDismiss={onClose}
+        onDismiss={() => {
+          resetForm();
+          onClose?.();
+        }}
         handleIndicatorStyle={{ backgroundColor: "#4b5563", width: 40 }}
         backgroundStyle={{ backgroundColor: "#1f1f1f", borderRadius: 24 }}
         backdropComponent={(props) => (
@@ -104,7 +178,11 @@ const NewWalkInSheet = forwardRef<BottomSheetModal, NewWalkInSheetProps>(
             />
             <TextInput
               value={search}
-              onChangeText={setSearch}
+              onChangeText={handleSearchChange}
+              onFocus={() => setIsSearchFocused(true)}
+              onBlur={() => {
+                setTimeout(() => setIsSearchFocused(false), 120);
+              }}
               placeholder="Nombre o teléfono..."
               placeholderTextColor="#6b7280"
               className="flex-1 text-white"
@@ -112,42 +190,83 @@ const NewWalkInSheet = forwardRef<BottomSheetModal, NewWalkInSheetProps>(
             />
           </View>
 
-          <View className="flex-row items-center mb-6">
-            <View className="h-px bg-white/10 flex-1" />
-            <Text className="text-tertiary text-xs px-2">O CREAR NUEVO</Text>
-            <View className="h-px bg-white/10 flex-1" />
-          </View>
+          {isSearchFocused && (
+            <View className="mt-[-16] mb-6 bg-black/40 rounded-xl overflow-hidden max-h-56">
+              {customersLoading ? (
+                <Text className="text-tertiary text-xs px-3 py-3">
+                  Buscando clientes...
+                </Text>
+              ) : filteredCustomers.length === 0 ? (
+                <Text className="text-tertiary text-xs px-3 py-3">
+                  Sin resultados
+                </Text>
+              ) : (
+                filteredCustomers.map((customer) => (
+                  <Pressable
+                    key={customer.id}
+                    onPress={() => handleSelectCustomer(customer)}
+                    className="px-3 py-3 border-b border-white/10"
+                  >
+                    <Text className="text-white">{customer.full_name}</Text>
+                    <Text className="text-tertiary text-xs">
+                      {customer.phone || "Sin teléfono"}
+                    </Text>
+                  </Pressable>
+                ))
+              )}
+            </View>
+          )}
 
-          <Text
-            bold
-            className="text-tertiary text-sm mb-2 uppercase"
-          >
-            Nombre
-          </Text>
-          <TextInput
-            value={customerName}
-            onChangeText={setCustomerName}
-            placeholder="Nombre del cliente"
-            placeholderTextColor="#6b7280"
-            className="bg-black/60 rounded-xl px-4 py-3 text-white mb-4"
-            style={{ fontFamily: "Comfortaa_400Regular" }}
-          />
+          {!selectedCustomer && (
+            <>
+              <View className="flex-row items-center mb-6">
+                <View className="h-px bg-white/10 flex-1" />
+                <Text className="text-tertiary text-xs px-2">O CREAR NUEVO</Text>
+                <View className="h-px bg-white/10 flex-1" />
+              </View>
 
-          <Text
-            bold
-            className="text-tertiary text-sm mb-2 uppercase"
-          >
-            Teléfono
-          </Text>
-          <TextInput
-            value={phone}
-            onChangeText={setPhone}
-            placeholder="999 999 999"
-            placeholderTextColor="#6b7280"
-            keyboardType="phone-pad"
-            className="bg-black/60 rounded-xl px-4 py-3 text-white mb-6"
-            style={{ fontFamily: "Comfortaa_400Regular" }}
-          />
+              <Text
+                bold
+                className="text-tertiary text-sm mb-2 uppercase"
+              >
+                Nombre
+              </Text>
+              <TextInput
+                value={customerName}
+                onChangeText={setCustomerName}
+                placeholder="Nombre del cliente"
+                placeholderTextColor="#6b7280"
+                className="bg-black/60 rounded-xl px-4 py-3 text-white mb-4"
+                style={{ fontFamily: "Comfortaa_400Regular" }}
+              />
+
+              <Text
+                bold
+                className="text-tertiary text-sm mb-2 uppercase"
+              >
+                Teléfono
+              </Text>
+              <TextInput
+                value={phone}
+                onChangeText={setPhone}
+                placeholder="999 999 999"
+                placeholderTextColor="#6b7280"
+                keyboardType="phone-pad"
+                className="bg-black/60 rounded-xl px-4 py-3 text-white mb-6"
+                style={{ fontFamily: "Comfortaa_400Regular" }}
+              />
+            </>
+          )}
+
+          {selectedCustomer && (
+            <View className="mb-6 rounded-xl border border-primary/40 bg-primary/10 px-4 py-3">
+              <Text className="text-primary">Cliente seleccionado</Text>
+              <Text className="text-white mt-1">{selectedCustomer.full_name}</Text>
+              <Text className="text-tertiary text-xs mt-1">
+                {selectedCustomer.phone || "Sin teléfono"}
+              </Text>
+            </View>
+          )}
 
           <Text
             bold
@@ -192,16 +311,24 @@ const NewWalkInSheet = forwardRef<BottomSheetModal, NewWalkInSheetProps>(
               isSubmitting ||
               servicesLoading ||
               services.length === 0 ||
-              !selectedServiceId
+              !selectedServiceId ||
+              (!selectedCustomer && !customerName.trim())
             }
             className="bg-[#292a2a] border border-primary rounded-full py-4"
             textClassName="text-white"
             leftIcon={
-              <Ionicons
-                name="add-circle"
-                size={18}
-                color="white"
-              />
+              isSubmitting ? (
+                <ActivityIndicator
+                  size="small"
+                  color="white"
+                />
+              ) : (
+                <Ionicons
+                  name="add-circle"
+                  size={18}
+                  color="white"
+                />
+              )
             }
           />
         </BottomSheetScrollView>

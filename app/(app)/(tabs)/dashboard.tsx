@@ -5,6 +5,7 @@ import DashboardGreeting from "@/components/dashboard/DashboardGreeting"
 import DashboardSummaryCards from "@/components/dashboard/DashboardSummaryCards"
 import UpcomingAppointments from "@/components/dashboard/UpcomingAppointments"
 import { useDashboard } from "@/hooks/useDashboard";
+import { useShopCustomers } from "@/hooks/useShopCustomers";
 import { useShopServices } from "@/hooks/useShopServices";
 import { NewWalkInSheet } from "@/components/appointments";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -15,6 +16,8 @@ export default function Dashboard() {
   const shopId = useAuthStore((state) => state.shopId);
   const { data: shopServices = [], isLoading: servicesLoading } =
     useShopServices(shopId);
+  const { data: shopCustomers = [], isLoading: customersLoading } =
+    useShopCustomers(shopId);
   const newWalkInSheetRef = useRef<BottomSheetModal>(null);
   const [isSubmittingWalkIn, setIsSubmittingWalkIn] = useState(false);
 
@@ -56,6 +59,8 @@ export default function Dashboard() {
         ref={newWalkInSheetRef}
         services={shopServices}
         servicesLoading={servicesLoading}
+        customers={shopCustomers}
+        customersLoading={customersLoading}
         isSubmitting={isSubmittingWalkIn}
         onSubmit={async (payload) => {
           if (!shopId) {

@@ -59,11 +59,11 @@ export default function UpcomingAppointments({
   if (!rows.length) {
     return (
       <View className="gap-3">
-        <Text bold className="text-white text-2xl">
+        <Text bold className="text-white text-xl">
           Próximos turnos
         </Text>
         <View className="rounded-3xl border border-dashed border-white/10 bg-white/5 px-4 py-6">
-          <Text className="text-tertiary text-center">
+          <Text className="text-tertiary text-center text-sm">
             No hay turnos próximos. Los nuevos walk-ins aparecerán aquí.
           </Text>
         </View>
