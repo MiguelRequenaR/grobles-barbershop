@@ -3,12 +3,13 @@ import { supabase } from "@/lib/supabase";
 export type CurrentShop = {
   id: string;
   name: string;
+  logo_url: string | null;
 };
 
 export async function getCurrentShopByOwner(userId: string) {
   const { data, error } = await supabase
     .from("shops")
-    .select("id, name")
+    .select("id, name, logo_url")
     .eq("owner_id", userId)
     .maybeSingle();
 
@@ -21,5 +22,6 @@ export async function getCurrentShopByOwner(userId: string) {
   return {
     id: data.id,
     name: data.name,
+    logo_url: data.logo_url,
   }
 }

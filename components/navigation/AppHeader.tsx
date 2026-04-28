@@ -1,6 +1,7 @@
 import { Text } from "@/components/ui/Text";
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable, View } from "react-native";
+import { Image } from "expo-image";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type AppHeaderProps = {
@@ -11,11 +12,15 @@ type AppHeaderProps = {
 };
 
 export default function AppHeader({
-  brandTitle = "Grobles",
+  brandTitle,
+  avatarUrl,
   onPressAvatar,
   onPressNotifications,
 }: AppHeaderProps) {
   const insets = useSafeAreaInsets();
+
+  const firstBrandName =
+    (brandTitle ?? "Barbería").trim().split(/\s+/)[0] || "Barbería";
   return (
     <View
       className="px-4 bg-transparent"
@@ -32,7 +37,7 @@ export default function AppHeader({
                 fontStyle: "italic",
               }}
             >
-              {brandTitle}
+              {firstBrandName}
             </Text>
           </View>
           <View className="flex-row items-center gap-x-1 bg-[#292a2a] rounded-full p-1">
@@ -42,11 +47,19 @@ export default function AppHeader({
                 hitSlop={12}
                 className="p-1 active:opacity-70"
               >
-                <Ionicons
-                  name="person-circle-outline"
-                  size={35}
-                  color="#ffffff"
-                />
+                {avatarUrl ? (
+                  <Image
+                    source={{ uri: avatarUrl }}
+                    className="w-[35px] h-[35px] rounded-full"
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <Ionicons
+                    name="person-circle-outline"
+                    size={35}
+                    color="#ffffff"
+                  />
+                )}
               </Pressable>
             </View>
             <View className="w-12 items-end">
