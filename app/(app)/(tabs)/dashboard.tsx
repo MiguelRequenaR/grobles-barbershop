@@ -46,6 +46,7 @@ export default function Dashboard() {
         <DashboardSummaryCards
           ingresos={data?.ingresos ?? 0}
           turnos={data?.turnos ?? 0}
+          clientesActivos={shopCustomers.length}
           isLoading={isLoading}
           onNewWalkIn={handleOpenWalkInSheet}
         />
@@ -78,7 +79,7 @@ export default function Dashboard() {
             });
             await refetch();
             newWalkInSheetRef.current?.dismiss();
-            Alert.alert("Listo", "Walk-in creado correctamente.");
+            Alert.alert("Turno creado correctamente.");
           } catch (error) {
             Alert.alert(
               "No se pudo crear el walk-in",

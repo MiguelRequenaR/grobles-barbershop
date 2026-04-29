@@ -4,9 +4,18 @@ import { useCalendarDay } from "@/hooks/useCalendarDay";
 import { useMemo, useState } from "react";
 import { ScrollView, View } from "react-native";
 
+const formatShortName = (fullName: string) => {
+  const parts = fullName.trim().split(/\s+/).filter(Boolean);
+
+  if (parts.length === 0) return "Sin nombre";
+  if (parts.length === 1) return parts[0];
+
+  return `${parts[0]} ${parts[1][0]?.toUpperCase()}.`;
+};
+
 export default function CalendarScreen() {
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const { data } = useCalendarDay({ selectedDate });
+  const { data, isLoading } = useCalendarDay({ selectedDate });
 
   const appointments = useMemo(() => {
     return (data ?? []).map((appointment) => {
@@ -25,16 +34,16 @@ export default function CalendarScreen() {
         .join("");
 
       const statusMap = {
-        completed: "Completed",
-        confirmed: "Confirmed",
-        pending: "InProgress",
-        cancelled: "Walk-in",
+        completed: "Completado",
+        confirmed: "Confirmado",
+        pending: "Pendiente",
+        cancelled: "Cancelado",
       } as const;
 
       return {
         id: appointment.id,
         time,
-        clientName: appointment.clientName,
+        clientName: formatShortName(appointment.clientName),
         serviceName: appointment.serviceName,
         serviceDuration: `${appointment.durationMin}m`,
         amount: appointment.price,
@@ -55,7 +64,10 @@ export default function CalendarScreen() {
         contentContainerClassName="pb-24"
         showsVerticalScrollIndicator={false}
       >
-        <CalendarAppointmetsList appointments={appointments} />
+        <CalendarAppointmetsList
+          appointments={appointments}
+          isLoading={isLoading}
+        />
       </ScrollView>
     </View>
   );

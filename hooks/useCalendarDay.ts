@@ -1,7 +1,7 @@
-import { useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { getCalendarAppointments } from "@/services/calendarService";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 
 type UseCalendarDayParams = {
   selectedDate: Date,
@@ -13,7 +13,10 @@ export function useCalendarDay({selectedDate}: UseCalendarDayParams) {
   const dateKey = useMemo(() => {
     const d = new Date(selectedDate);
     d.setHours(0, 0, 0, 0);
-    return d.toISOString().slice(0, 10);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
   }, [selectedDate])
 
   return useQuery({

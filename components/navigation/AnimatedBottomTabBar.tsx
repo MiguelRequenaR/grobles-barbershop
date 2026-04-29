@@ -18,7 +18,7 @@ type TabConfig = {
 };
 
 const TAB_CONFIG: Record<string, TabConfig> = {
-  dashboard: { label: "Home", icon: "grid-outline" },
+  dashboard: { label: "Inicio", icon: "grid-outline" },
   calendar: { label: "Calendario", icon: "calendar-outline" },
   clients: { label: "Clientes", icon: "people-outline" },
   rewards: { label: "Recompensas", icon: "gift-outline" },
@@ -30,7 +30,7 @@ const H_PADDING = 14;
 const ICON_LABEL_GAP = 6;
 const ACTIVE_COLOR = "#ff9900";
 const INACTIVE_COLOR = "#4b5563";
-const LABEL_COLOR = "#ffffff";
+const LABEL_COLOR = "#1f1f1f";
 
 export default function AnimatedBottomTabBar({
   state,

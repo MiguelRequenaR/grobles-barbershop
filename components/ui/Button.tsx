@@ -19,6 +19,7 @@ export default function Button({
   textClassName = "",
   leftIcon,
 }: ButtonProps) {
+  const resolvedTextClass = textClassName || "text-white";
   return (
     <Pressable
       onPress={onPress}
@@ -27,7 +28,7 @@ export default function Button({
     >
       <View className="flex-row items-center gap-2">
         {leftIcon}
-        <Text className={`text-white text-base font-medium ${textClassName}`}>
+        <Text className={`text-base font-medium ${resolvedTextClass}`}>
           {title}
         </Text>
       </View>

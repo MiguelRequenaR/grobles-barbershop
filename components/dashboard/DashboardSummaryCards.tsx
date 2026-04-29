@@ -6,6 +6,7 @@ import { View } from "react-native";
 interface DashboardSummaryCardsProps {
   ingresos: number;
   turnos: number;
+  clientesActivos: number;
   isLoading?: boolean;
   onNewWalkIn?: () => void;
 }
@@ -20,6 +21,7 @@ const formatCurrency = (amount: number) =>
 export default function DashboardSummaryCards({
   ingresos,
   turnos,
+  clientesActivos,
   isLoading = false,
   onNewWalkIn,
 }: DashboardSummaryCardsProps) {
@@ -46,17 +48,27 @@ export default function DashboardSummaryCards({
           </View>
         </View>
       </View>
-
+      <View className="flex-row">
+        <View className="flex-1 bg-[#292a2a] border border-primary rounded-3xl p-4">
+          <Text bold className="text-2xl font-bold text-white">
+            {isLoading ? "..." : clientesActivos}
+          </Text>
+          <View className="flex-row items-center gap-2">
+            <Ionicons name="people-outline" size={24} color="white" />
+            <Text className="text-sm text-white">Clientes activos</Text>
+          </View>
+        </View>
+      </View>
       <Button
         title="Nuevo Walk-in"
         onPress={onNewWalkIn ?? (() => {})}
-        className="bg-[#292a2a] border border-primary rounded-full py-4"
+        className="bg-primary rounded-full py-4"
         textClassName="text-secondary"
         leftIcon={
           <Ionicons
             name="add-circle"
             size={24}
-            color="white"
+            color="#1f1f1f"
           />
         }
       />

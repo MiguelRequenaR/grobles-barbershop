@@ -34,9 +34,13 @@ export async function getCalendarAppointments(
   shopId: string,
   date: string,
 ): Promise<CalendarAppointment[]> {
-  const targetDate = new Date(date);
-  if (Number.isNaN(targetDate.getTime())){
-    throw new Error("Fecha invalida en getCalendar")
+  const [year, month, day] = date.split("-").map(Number);
+  if (!year || !month || !day) {
+    throw new Error("Fecha invalida en getCalendar");
+  }
+  const targetDate = new Date(year, month - 1, day);
+  if (Number.isNaN(targetDate.getTime())) {
+    throw new Error("Fecha invalida en getCalendar");
   }
   const startOfDay = new Date(targetDate);
   startOfDay.setHours(0, 0, 0, 0);
@@ -52,7 +56,7 @@ export async function getCalendarAppointments(
       appointment_date,
       status,
       customers(
-        full_name,
+        full_name
       ),
       services(
         name,
