@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { Alert, RefreshControl, ScrollView } from "react-native";
+import { Alert, ScrollView } from "react-native";
 import DashboardGreeting from "@/components/dashboard/DashboardGreeting"
 import DashboardSummaryCards from "@/components/dashboard/DashboardSummaryCards"
 import UpcomingAppointments from "@/components/dashboard/UpcomingAppointments"
@@ -10,9 +10,11 @@ import { useShopServices } from "@/hooks/useShopServices";
 import { NewWalkInSheet } from "@/components/appointments";
 import { useAuthStore } from "@/store/useAuthStore";
 import { createWalkInAppointment } from "@/services/walkInService";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function Dashboard() {
-  const { data, isLoading, isRefetching, refetch } = useDashboard();
+  const queryClient = useQueryClient();
+  const { data, isLoading, refetch } = useDashboard();
   const shopId = useAuthStore((state) => state.shopId);
   const { data: shopServices = [], isLoading: servicesLoading } =
     useShopServices(shopId);
@@ -20,10 +22,6 @@ export default function Dashboard() {
     useShopCustomers(shopId);
   const newWalkInSheetRef = useRef<BottomSheetModal>(null);
   const [isSubmittingWalkIn, setIsSubmittingWalkIn] = useState(false);
-
-  const onRefresh = useCallback(async () => {
-    await refetch();
-  }, [refetch]);
 
   const handleOpenWalkInSheet = useCallback(() => {
     newWalkInSheetRef.current?.present();
@@ -34,13 +32,6 @@ export default function Dashboard() {
       <ScrollView
         className="flex-1"
         contentContainerClassName="p-4 pt-32 gap-6 pb-24"
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefetching}
-            onRefresh={onRefresh}
-            tintColor="#d97706"
-          />
-        }
       >
         <DashboardGreeting />
         <DashboardSummaryCards
@@ -78,6 +69,9 @@ export default function Dashboard() {
               serviceId: payload.serviceId,
             });
             await refetch();
+            await queryClient.invalidateQueries({
+              queryKey: ["calendar", "day", shopId],
+            });
             newWalkInSheetRef.current?.dismiss();
             Alert.alert("Turno creado correctamente.");
           } catch (error) {

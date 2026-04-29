@@ -33,6 +33,13 @@ export default function AppTabsLayout() {
           title: "Clientes",
         }}
       />
+      <Tabs.Screen
+        name="clients/[id]"
+        options={{
+          href: null,
+          title: "Cliente",
+        }}
+      />
 
       <Tabs.Screen
         name="rewards"

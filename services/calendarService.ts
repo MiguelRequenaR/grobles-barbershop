@@ -83,3 +83,25 @@ export async function getCalendarAppointments(
     price: appointment.services?.price ?? 0,
   }));
 }
+
+export async function updateAppointmentStatus(
+  appointmentId: string,
+  status: AppointmentStatus,
+): Promise<void> {
+  const { error } = await supabase
+    .from("appointments")
+    .update({ status })
+    .eq("id", appointmentId);
+
+  if (error) {
+    throw new Error(error.message || "No se pudo actualizar el estado del turno.");
+  }
+}
+
+export async function deleteAppointment(appointmentId: string): Promise<void> {
+  const { error } = await supabase.from("appointments").delete().eq("id", appointmentId);
+
+  if (error) {
+    throw new Error(error.message || "No se pudo eliminar el turno.");
+  }
+}

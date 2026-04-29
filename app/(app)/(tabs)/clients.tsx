@@ -1,9 +1,10 @@
-import { Text, View } from "react-native";
+import ClientsDirectory from "@/components/clients/ClientsDirectory";
+import { useShopCustomers } from "@/hooks/useShopCustomers";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export default function ClientsScreen() {
-  return (
-    <View className="flex-1 items-center justify-center pt-32">
-      <Text className="text-base text-[#1f1f1f]">Clientes</Text>
-    </View>
-  );
+  const shopId = useAuthStore((state) => state.shopId);
+  const { data: customers = [], isLoading } = useShopCustomers(shopId);
+
+  return <ClientsDirectory customers={customers} isLoading={isLoading} />;
 }

@@ -38,6 +38,8 @@ export default function AnimatedBottomTabBar({
   navigation,
 }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
+  const visibleRoutes = state.routes.filter((route) => TAB_CONFIG[route.name]);
+  const activeRouteName = state.routes[state.index]?.name ?? "";
 
   return (
     <View
@@ -72,8 +74,10 @@ export default function AnimatedBottomTabBar({
                 : "#1f1f1f",
           }}
         >
-          {state.routes.map((route, index) => {
-            const isFocused = state.index === index;
+          {visibleRoutes.map((route) => {
+            const isFocused =
+              activeRouteName === route.name ||
+              activeRouteName.startsWith(`${route.name}/`);
             const config = TAB_CONFIG[route.name] ?? {
               label: route.name,
               icon: "ellipse-outline" as const,
