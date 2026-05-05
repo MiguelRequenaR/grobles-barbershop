@@ -1,7 +1,7 @@
 import { Text } from "@/components/ui/Text";
 import { Ionicons } from "@expo/vector-icons";
-import { Pressable, View } from "react-native";
 import { Image } from "expo-image";
+import { Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type AppHeaderProps = {
@@ -9,6 +9,7 @@ type AppHeaderProps = {
   avatarUrl?: string;
   onPressAvatar?: () => void;
   onPressNotifications?: () => void;
+  avatarMode?: "avatar" | "dashboard";
 };
 
 export default function AppHeader({
@@ -16,6 +17,7 @@ export default function AppHeader({
   avatarUrl,
   onPressAvatar,
   onPressNotifications,
+  avatarMode = "avatar"
 }: AppHeaderProps) {
   const insets = useSafeAreaInsets();
 
@@ -47,16 +49,18 @@ export default function AppHeader({
                 hitSlop={12}
                 className="p-1 active:opacity-70"
               >
-                {avatarUrl ? (
+                {avatarMode === "dashboard" ? (
+                  <Ionicons name="grid-outline" size={30} color="#ffffff" />
+                ) : avatarUrl ? (
                   <Image
                     source={{ uri: avatarUrl }}
                     className="w-[35px] h-[35px] rounded-full"
-                    resizeMode="cover"
+                    contentFit="cover"
                   />
                 ) : (
                   <Ionicons
                     name="person-circle-outline"
-                    size={35}
+                    size={30}
                     color="#ffffff"
                   />
                 )}
