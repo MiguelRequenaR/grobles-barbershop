@@ -32,21 +32,28 @@ export default function CalendarGreeting({
 }: CalendarGreetingProps) {
   const listRef = useRef<FlatList<Date>>(null);
   const { width: screenWidth } = useWindowDimensions();
-  const [initialDate] = useState(() => startOfDay(selectedDate ?? new Date()));
+  const [today] = useState(() => startOfDay(new Date()));
+  const [initialDate] = useState(() => {
+    const base = startOfDay(selectedDate ?? new Date());
+    return base.getTime() > today.getTime() ? today : base;
+  })
   const [currentSelectedDate, setCurrentSelectedDate] = useState(initialDate);
   const sidePadding = Math.max((screenWidth - DAY_CARD_WIDTH) / 2, 0);
 
   useEffect(() => {
     if (!selectedDate) return;
-    setCurrentSelectedDate(startOfDay(selectedDate));
-  }, [selectedDate]);
+    const normalized = startOfDay(selectedDate);
+    setCurrentSelectedDate(
+      normalized.getTime() > today.getTime() ? today : normalized
+    );
+  }, [selectedDate, today]);
 
   const dates = useMemo(
     () =>
-      Array.from({ length: TOTAL_SIDE_DAYS * 2 + 1 }, (_, index) =>
-        addDays(initialDate, index - TOTAL_SIDE_DAYS),
+      Array.from({ length: TOTAL_SIDE_DAYS + 1 }, (_, index) =>
+        addDays(today, index - TOTAL_SIDE_DAYS),
       ),
-    [initialDate],
+    [today],
   );
 
   const formattedSelectedDate = currentSelectedDate.toLocaleDateString(
@@ -75,7 +82,7 @@ export default function CalendarGreeting({
         horizontal
         showsHorizontalScrollIndicator={false}
         initialScrollIndex={TOTAL_SIDE_DAYS}
-        contentContainerStyle={{ paddingHorizontal: sidePadding }}
+        contentContainerStyle={{ paddingLeft: sidePadding }}
         getItemLayout={(_, index) => ({
           length: DAY_ITEM_SIZE,
           offset: DAY_ITEM_SIZE * index,
@@ -86,7 +93,6 @@ export default function CalendarGreeting({
             listRef.current?.scrollToIndex({
               index: TOTAL_SIDE_DAYS,
               animated: false,
-              viewPosition: 0.5,
             });
           });
         }}
